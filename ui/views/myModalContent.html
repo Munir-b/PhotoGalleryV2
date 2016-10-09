@@ -1,0 +1,19 @@
+
+
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<div class="modal-header">
+    <h3 class="modal-title">Create New Gallery</h3>
+</div>
+<div class="modal-body">
+    <form novalidate class="simple-form">
+        Gallery Name: <input type="text" ng-model="gallery.name" /><br />
+        Gallery Description: <input type="text" ng-model="gallery.description" /><br />
+        Gallery Type: <input type="radio" ng-model="gallery.type" value="shared"/>shared
+                        <input type="radio" ng-model="gallery.type" value="private"/>private<br />
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok(gallery)">OK</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>
+

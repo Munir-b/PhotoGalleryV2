@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<h1>{{currentUser}}'s GALLERIES</h1>
+<div ng-controller="modalCtrl">
+    <button type="button" class="btn btn-default" ng-click="open('views/myModalContent.html')">Add Gallery</button>
+</div>
+<div>
+    <table>
+        <tr ng-repeat="gallery in galleries">
+            <td>{{gallery}}</td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

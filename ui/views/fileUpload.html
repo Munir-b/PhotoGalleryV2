@@ -1,0 +1,39 @@
+<style>
+    .thumb {
+        width: 24px;
+        height: 24px;
+        float: none;
+        position: relative;
+        top: 7px;
+    }
+
+    form .progress {
+        line-height: 15px;
+    }
+
+    .progress {
+        display: inline-block;
+        width: 100px;
+        border: 3px groove #CCC;
+    }
+
+    .progress div {
+        font-size: smaller;
+        background: orange;
+        width: 0;
+    }
+</style>
+<body ng-controller="fileUploadCtrl">
+<legend>Upload photos</legend>
+
+<form id        =  "uploadForm"
+      enctype   =  "multipart/form-data"
+      action    =  "/uploads"
+      method    =  "post"
+        >
+    <input type="file" accept="image/*" name="userPhoto" multiple/>
+    <input type="submit" value="Upload Image" name="submit">
+
+
+</form>
+</body>

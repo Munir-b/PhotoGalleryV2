@@ -11,7 +11,7 @@
   server.use(bodyParser.urlencoded({'extended':'true'}));            // parse application/x-www-form-urlencoded
   server.use(bodyParser.json());                                     // parse application/json
   server.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
-  server.use(express.static(__dirname + '../ui'));
+  server.use(express.static(__dirname + '/..'));
 
   // db configuration
   var config = require('./config.js');
@@ -19,10 +19,10 @@
   var assert = require('assert');
   var dbUrl = config.database;
 
-
+  var apiRoutes = express.Router();
   server.get('/', function(req, res) {
     var options = {
-      root: __dirname + '/../ui/'
+      root: __dirname + '/..'
     };
     res.sendFile('index.html', options); // load the single view file (angular will handle the page changes on the front-end)
   });
@@ -31,7 +31,7 @@
 //================ API routes ================
 
 //route to signup for new users (POST http://localhost:8888/signup)
-  server.post('/signup', function(req, res) {
+  apiRoutes.post('/signup', function(req, res) {
     MongoClient.connect(dbUrl, function(err, db) {
       if(err) throw new Error('error connecting to db :' + err);
       db.collection('users').find({username:req.body.username},function(err,cursor){
@@ -72,7 +72,7 @@
 
 // route to authenticate a user (POST http://localhost:8888/authenticate)
 // body = {username: username}
-  server.post('/authenticate', function(req, res) {
+  apiRoutes.post('/authenticate', function(req, res) {
     MongoClient.connect(dbUrl, function(err, db){
       db.collection('users').find({username:req.body.username},function(err,cursor){
         if(err) throw new Error('error finding user: '+req.body.username);
@@ -114,7 +114,7 @@
   });
 
 //route to get user info (GET http://localhost:8888/users/username)
-  server.get('/users/:username',function(req,res){
+  apiRoutes.get('/users/:username',function(req,res){
     MongoClient.connect(dbUrl, function(err, db){
       db.collection('users').findOne({username:req.params.username},function(err,result){
         assert.equal(err,null);
@@ -130,7 +130,7 @@
    *  ["1","2"]
    *
    */
-  server.put('/photos/:username',function(req,res){
+  apiRoutes.put('/photos/:username',function(req,res){
     MongoClient.connect(dbUrl,function(err,db){
       assert.equal(err,null);
       db.collection('users').updateOne({username:req.params.username},{$addToSet:{photos:{$each:req.body}}},function(err,item){
@@ -149,7 +149,7 @@
   /**
    * when updating galleries , expecting "galleries":"galleryName"
    */
-  server.post('/galleries/:username',function(req,res){
+  apiRoutes.post('/galleries/:username',function(req,res){
     MongoClient.connect(dbUrl,function(err,db){
       assert.equal(err,null);
       db.collection('users').updateOne({username:req.params.username},{$addToSet:{galleries:req.body.galleries}},function(err,item){
@@ -170,7 +170,7 @@
 
 //route to delete a user (DELETE http://localhost:8888/users/username)
 //TODO: remove user's galleries and photos
-  server.delete('/users/:username',function(req,res){
+  apiRoutes.delete('/users/:username',function(req,res){
     MongoClient.connect(dbUrl,function(err,db){
       assert.equal(err,null);
       db.collection('users').deleteOne({username:req.params.username},function(err,result){
@@ -195,6 +195,7 @@
     })
   });
 
+  server.use('/api', apiRoutes);
   process.on('uncaughtException', function(err) {
     console.log(err);
   });
