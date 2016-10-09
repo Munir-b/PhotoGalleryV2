@@ -20,7 +20,7 @@
   var dbUrl = config.database;
 
 
-  server.get('*', function(req, res) {
+  server.get('/', function(req, res) {
     var options = {
       root: __dirname + '/../ui/'
     };
@@ -49,7 +49,8 @@
             db.close();
           }
           else{
-            var user = req.body;
+            var user = {};
+            user.username = req.body.username;
             user.galleries = {};
             user.photos = {};
             db.collection('users').insertOne(user,function(err,result){
@@ -115,26 +116,9 @@
 //route to get user info (GET http://localhost:8888/users/username)
   server.get('/users/:username',function(req,res){
     MongoClient.connect(dbUrl, function(err, db){
-      db.collection('users').findOne({username:req.params.username},{fields:{password:0,photos:0}},function(err,result){
+      db.collection('users').findOne({username:req.params.username},function(err,result){
         assert.equal(err,null);
         res.json(result);
-        db.close();
-      });
-    });
-  });
-
-//route to update a user properties not including galleries and photos (PUT http://localhost:8888/users/username)
-  server.put('/users/:username',function(req,res){
-    MongoClient.connect(dbUrl,function(err,db){
-      assert.equal(err,null);
-      db.collection('users').update({username:req.params.username},{$set:req.body},function(err,item){
-        assert.equal(err,null);
-        assert.equal(item.result.ok,1);
-        assert.equal(item.result.n,1);
-        res.status(200).json({
-          success:true,
-          message:'user was updated successfully'
-        });
         db.close();
       });
     });
@@ -149,7 +133,7 @@
   server.put('/photos/:username',function(req,res){
     MongoClient.connect(dbUrl,function(err,db){
       assert.equal(err,null);
-      db.collection('users').update({username:req.params.username},{$addToSet:{photos:{$each:req.body}}},function(err,item){
+      db.collection('users').updateOne({username:req.params.username},{$addToSet:{photos:{$each:req.body}}},function(err,item){
         assert.equal(err,null);
         assert.equal(item.result.ok,1);
         res.status(200).json({
@@ -168,11 +152,11 @@
   server.post('/galleries/:username',function(req,res){
     MongoClient.connect(dbUrl,function(err,db){
       assert.equal(err,null);
-      db.collection('users').update({username:req.params.username},{$addToSet:{galleries:req.body.galleries}},function(err,item){
+      db.collection('users').updateOne({username:req.params.username},{$addToSet:{galleries:req.body.galleries}},function(err,item){
         assert.equal(err,null);
         assert.equal(item.result.ok,1);
         assert.equal(item.result.n,1);
-        db.collection('galleries').insert({galleryName:req.body.galleries,galleryOwner:req.params.username},function(err,result){
+        db.collection('galleries').insertOne({galleryName:req.body.galleries,galleryOwner:req.params.username},function(err,result){
           assert.equal(err,null);
           res.status(200).json({
             success:true,
