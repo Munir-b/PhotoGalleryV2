@@ -5,7 +5,9 @@
   config(['$routeProvider', function($routeProvider) {
     $routeProvider
     .when('/home',{
-      templateUrl:'ui/views/home.html'
+      controller: 'homeCtrl',
+      templateUrl:'ui/views/home.html',
+      scope: {}
     }).
     when('/galleries',{
       controller:'galleriesCtrl',
